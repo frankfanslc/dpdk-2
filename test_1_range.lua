@@ -4,7 +4,8 @@ require "Pktgen"
 --pktgen.page("range");
 
 -- Set up first port
-pktgen.set_mac("0","b8:59:9f:0d:8f:4a");
+pktgen.set_mac("0","dst","3c:fd:fe:9c:5c:b8");
+pktgen.set_mac("0","src","3c:fd:fe:9c:5c:a8");
 
 pktgen.range.dst_ip("0", "start", "192.168.0.1");
 pktgen.range.dst_ip("0", "inc", "0.0.0.1");
