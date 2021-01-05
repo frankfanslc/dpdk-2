@@ -1,0 +1,16 @@
+diff --git a/drivers/net/i40e/i40e_rxtx_vec_common.h b/drivers/net/i40e/i40e_rxtx_vec_common.h
+index 0e6ffa007..0b941afe1 100644
+--- a/drivers/net/i40e/i40e_rxtx_vec_common.h
++++ b/drivers/net/i40e/i40e_rxtx_vec_common.h
+@@ -94,6 +94,11 @@ i40e_tx_free_bufs(struct i40e_tx_queue *txq)
+ 	  * tx_next_dd - (tx_rs_thresh-1)
+ 	  */
+ 	txep = &txq->sw_ring[txq->tx_next_dd - (n - 1)];
++
++	for (i = 0; i < txq->tx_rs_thresh; i++){
++		rte_prefetch0((txep + i)->mbuf);
++		rte_prefetch0((void *)((unsigned long long)((txep + i)->mbuf)+64));
++        }
+ 	m = rte_pktmbuf_prefree_seg(txep[0].mbuf);
+ 	if (likely(m != NULL)) {
+ 		free[0] = m;

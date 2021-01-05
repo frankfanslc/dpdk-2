@@ -1,0 +1,69 @@
+diff --git a/app/lpktgenlib.c b/app/lpktgenlib.c
+index 5c0bd0e..7849af0 100644
+--- a/app/lpktgenlib.c
++++ b/app/lpktgenlib.c
+@@ -561,14 +561,14 @@ pktgen_set_mac(lua_State *L)
+ 
+ 	switch (lua_gettop(L) ) {
+ 	default: return luaL_error(L, "set_mac, wrong number of arguments");
+-	case 2:
++	case 3:
+ 		break;
+ 	}
+ 	portlist_parse(luaL_checkstring(L, 1), &portlist);
+-	pg_ether_aton(luaL_checkstring(L, 2), &mac);
++	pg_ether_aton(luaL_checkstring(L, 3), &mac);
+ 
+ 	foreach_port(portlist,
+-	             single_set_dst_mac(info, &mac) );
++	             single_set_mac(info, luaL_checkstring(L, 2), &mac) );
+ 
+ 	pktgen_update_display();
+ 	return 0;
+diff --git a/app/pktgen-cmds.c b/app/pktgen-cmds.c
+index 74fd4cf..3e7bbb8 100644
+--- a/app/pktgen-cmds.c
++++ b/app/pktgen-cmds.c
+@@ -2834,6 +2834,30 @@ single_set_ipaddr(port_info_t *info, char type, struct pg_ipaddr *ip)
+ 
+ /**************************************************************************//**
+  *
++ * single_set_mac - Setup the MAC address
++ *
++ * DESCRIPTION
++ * Set the MAC address for all ports given.
++ *
++ * RETURNS: N/A
++ *
++ * SEE ALSO:
++ */
++
++void
++single_set_mac(port_info_t *info, const char *which, struct ether_addr *mac)
++{
++        if (!strcmp(which, "dst")){
++            memcpy(&info->seq_pkt[SINGLE_PKT].eth_dst_addr, mac, 6);
++            pktgen_packet_ctor(info, SINGLE_PKT, -1);
++        } else if (!strcmp(which, "src")){
++            memcpy(&info->seq_pkt[SINGLE_PKT].eth_src_addr, mac, 6);
++            pktgen_packet_ctor(info, SINGLE_PKT, -1);
++        }
++}
++
++/**************************************************************************//**
++ *
+  * single_set_dst_mac - Setup the destination MAC address
+  *
+  * DESCRIPTION
+diff --git a/app/pktgen-cmds.h b/app/pktgen-cmds.h
+index b10a210..c538811 100644
+--- a/app/pktgen-cmds.h
++++ b/app/pktgen-cmds.h
+@@ -71,6 +71,7 @@ void single_set_proto(port_info_t *info, char *type);
+ void single_set_vlan_id(port_info_t *info, uint16_t vlanid);
+ void single_set_cos(port_info_t *info, uint8_t cos);
+ void single_set_tos(port_info_t *info, uint8_t tos);
++void single_set_mac(port_info_t *info, const char *which, struct ether_addr *mac);
+ void single_set_dst_mac(port_info_t *info, struct pg_ether_addr *mac);
+ void single_set_src_mac(port_info_t *info, struct pg_ether_addr *mac);
+ void single_set_pkt_type(port_info_t *info, const char *type);
