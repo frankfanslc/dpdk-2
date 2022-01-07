@@ -18,10 +18,11 @@ pktgen.set("0", "dport", 3000);
 pktgen.set("0", "sport", 2000);
 
 -- Set up all port
-pktgen.range.pkt_size("0", "start", 128);
+pktgen.range.pkt_size("0", "start", 64);
 pktgen.range.pkt_size("0", "inc", 0);
-pktgen.range.pkt_size("0", "min", 128);
+pktgen.range.pkt_size("0", "min", 64);
 pktgen.range.pkt_size("0", "max", 256);
 
 pktgen.set_proto("all", "udp");
 pktgen.set_range("all", "on");
+pktgen.start("all");
